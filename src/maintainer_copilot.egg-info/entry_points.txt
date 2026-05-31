@@ -1,0 +1,2 @@
+[console_scripts]
+mcopilot = maintainer_copilot.cli:run

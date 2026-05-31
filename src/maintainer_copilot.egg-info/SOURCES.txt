@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/maintainer_copilot/__init__.py
+src/maintainer_copilot/cli.py
+src/maintainer_copilot/triage.py
+src/maintainer_copilot.egg-info/PKG-INFO
+src/maintainer_copilot.egg-info/SOURCES.txt
+src/maintainer_copilot.egg-info/dependency_links.txt
+src/maintainer_copilot.egg-info/entry_points.txt
+src/maintainer_copilot.egg-info/requires.txt
+src/maintainer_copilot.egg-info/top_level.txt
