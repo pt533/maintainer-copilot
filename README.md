@@ -108,7 +108,11 @@ This project is meant to grow into a practical maintainer assistant for those wo
 ## Contributing
 
 This project is currently early-stage, but feedback and small improvements are welcome.
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
+
+## Security
+
+Please read [SECURITY.md](./SECURITY.md) before reporting vulnerabilities.
 
 ## License
-
-MIT
+MIT. See [LICENSE](./LICENSE).
