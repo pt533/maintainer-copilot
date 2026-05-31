@@ -1,5 +1,24 @@
 # maintainer-copilot
 
+## Current status
+
+This repository is in early development.
+The current focus is improving the maintainer workflow foundation, including:
+- issue templates
+- pull request templates
+- contribution guidance
+- security reporting guidance
+- label and milestone based tracking
+
+## Maintainer workflow
+
+This repository uses:
+- issue templates for structured reports
+- pull request templates for consistent review
+- labels for triage and prioritization
+- milestones for tracking roadmap progress
+- CODEOWNERS for repository ownership clarity
+
 A small open-source CLI for OSS maintainer workflows.
 
 The current version focuses on **issue triage**:
