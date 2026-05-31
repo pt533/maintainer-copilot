@@ -1,6 +1,6 @@
-# Contributing to maintainer-copilot
+# Contributing
 
-Thanks for your interest in contributing.
+Thanks for your interest in contributing to maintainer-copilot.
 
 ## Before you start
 
