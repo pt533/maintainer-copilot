@@ -82,6 +82,22 @@ pip install -e .
 mcopilot examples/sample_issue.md
 ```
 
+## Example
+
+Example input issue:
+
+```text
+The CLI crashes when I run it on Python 3.11.
+I expected it to print triage output, but it exits with an error.
+No reproduction steps were included.
+```
+
+Example triage focus:
+
+- summarize the report
+- suggest likely labels such as `bug` or `needs-info`
+- highlight missing reproduction details
+
 ## Current scope
 
 This repository is currently a minimal starter for:
