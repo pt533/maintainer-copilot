@@ -15,7 +15,9 @@ def suggest_labels(text: str) -> list[str]:
     lowered = text.lower()
     labels = []
 
-    if any(word in lowered for word in BUG_WORDS):
+    bug_like = any(word in lowered for word in BUG_WORDS)
+
+    if bug_like:
         labels.append("bug")
     if any(word in lowered for word in QUESTION_WORDS):
         labels.append("question")
@@ -23,7 +25,18 @@ def suggest_labels(text: str) -> list[str]:
         labels.append("enhancement")
     if not labels:
         labels.append("needs-triage")
-    if "version" not in lowered or "environment" not in lowered:
+
+    missing_bug_context = any(
+        phrase not in lowered
+        for phrase in [
+            "version",
+            "steps to reproduce",
+            "expected behavior",
+            "actual behavior",
+        ]
+    )
+
+    if bug_like and missing_bug_context:
         labels.append("needs-info")
 
     return list(dict.fromkeys(labels))
