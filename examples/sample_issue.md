@@ -7,3 +7,8 @@ The app crashes immediately with a traceback.
 
 Expected behavior:
 The app should start normally.
+
+What is missing:
+- app version or commit SHA
+- steps to reproduce
+- environment details beyond the OS
