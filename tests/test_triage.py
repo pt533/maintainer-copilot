@@ -57,3 +57,34 @@ I get an error when launching the app.
     assert "steps to reproduce" in missing
     assert "expected behavior" in missing
     assert "actual behavior" in missing
+
+def test_question_like_request_prefers_question():
+    text = """Title: How can I configure labels for my repository?
+
+Can you help me understand how to set this up?
+"""
+    labels = suggest_labels(text)
+
+    assert "question" in labels
+    assert "enhancement" not in labels
+
+
+def test_enhancement_request_prefers_enhancement():
+    text = """Title: Feature request: support custom default labels
+
+I would like support for configuring default labels during triage.
+"""
+    labels = suggest_labels(text)
+
+    assert "enhancement" in labels
+    assert "question" not in labels
+
+def test_question_about_support_prefers_question():
+    text = """Title: Can you support configuration for labels?
+
+How can I configure labels for my repository?
+"""
+    labels = suggest_labels(text)
+
+    assert "question" in labels
+    assert "enhancement" not in labels

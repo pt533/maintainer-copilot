@@ -17,11 +17,27 @@ def suggest_labels(text: str) -> list[str]:
 
     bug_like = any(word in lowered for word in BUG_WORDS)
 
+    lines = [line.strip().lower() for line in text.splitlines() if line.strip()]
+    title = lines[0] if lines else ""
+    question_like = any(word in lowered for word in QUESTION_WORDS)
+    feature_like = any(word in lowered for word in FEATURE_WORDS)
+
+    question_title_prefixes = (
+        "title: how",
+        "title: why",
+        "title: can",
+        "title: does",
+        "how",
+        "why",
+        "can",
+        "does",
+    )
+
     if bug_like:
         labels.append("bug")
-    if any(word in lowered for word in QUESTION_WORDS):
+    if question_like:
         labels.append("question")
-    if any(word in lowered for word in FEATURE_WORDS):
+    if feature_like and not title.startswith(question_title_prefixes):
         labels.append("enhancement")
     if not labels:
         labels.append("needs-triage")
