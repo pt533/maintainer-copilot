@@ -1,4 +1,4 @@
-from maintainer_copilot.triage import suggest_labels, missing_information
+from maintainer_copilot.triage import parse_issue_sections, suggest_labels, missing_information
 
 
 def test_complete_bug_does_not_get_needs_info():
@@ -88,3 +88,53 @@ How can I configure labels for my repository?
 
     assert "question" in labels
     assert "enhancement" not in labels
+
+def test_parse_issue_sections_normalizes_template_headings():
+    text = """Title: Bug report
+
+## Reproduction steps
+1. Run the CLI
+2. Observe the output
+
+## What did you expect?
+The command succeeds.
+
+## What happened?
+A traceback is printed.
+"""
+    sections = parse_issue_sections(text)
+
+    assert sections["steps_to_reproduce"] == "1. Run the CLI\n2. Observe the output"
+    assert sections["expected_behavior"] == "The command succeeds."
+    assert sections["actual_behavior"] == "A traceback is printed."
+
+
+def test_missing_information_uses_template_sections_and_keeps_free_form_fallback():
+    template_text = """Title: Crash report
+
+## Version
+1.2.3
+
+## Environment
+Ubuntu 24.04
+
+## Steps to reproduce
+1. Run the CLI
+
+## Expected behavior
+The command succeeds.
+
+## Actual behavior
+The command crashes.
+"""
+    free_form_text = """Title: Crash report
+
+Version: 1.2.3
+Environment: Ubuntu 24.04
+Steps to reproduce: run the CLI
+Expected behavior: the command succeeds
+Actual behavior: the command crashes
+"""
+
+    assert missing_information(template_text) == []
+    assert missing_information(free_form_text) == []
