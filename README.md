@@ -1,129 +1,152 @@
 # maintainer-copilot
 
-## Current status
+A small open-source CLI that helps maintainers triage issues faster.
 
-This repository is in early development.
-The current focus is improving the maintainer workflow foundation, including:
-- issue templates
-- pull request templates
-- contribution guidance
-- security reporting guidance
-- label and milestone based tracking
+`maintainer-copilot` reads a Markdown issue report and returns:
+- a concise summary
+- initial label candidates
+- missing information to request before review
 
-## Maintainer workflow
+The goal is simple: reduce repetitive first-pass maintainer work so humans can spend more time on actual decisions.
 
-This repository uses:
-- issue templates for structured reports
-- pull request templates for consistent review
-- labels for triage and prioritization
-- milestones for tracking roadmap progress
-- CODEOWNERS for repository ownership clarity
+## Why this project matters
 
-A small open-source CLI for OSS maintainer workflows.
+Open-source maintenance includes a large amount of invisible work: reading incomplete reports, deciding initial labels, and asking for missing details before real debugging can begin.
 
-The current version focuses on **issue triage**:
-- summarize an issue
-- suggest labels
-- point out missing information before review
+This project focuses on one narrow but common maintainer task first:
+**issue triage**.
 
-## Why
+By starting with a local-first CLI, the repository aims to build a transparent foundation for future maintainer workflows such as GitHub automation, review assistance, and release preparation.
 
-Maintainers spend time on repetitive first-pass work before they can make real decisions.
-This project aims to reduce that overhead with a small, understandable, local-first tool.
+## Current capabilities
 
-It is intentionally starting from one narrow maintainer task:
-issue triage.
+Today the tool can:
+- summarize an issue report
+- suggest likely labels such as `bug`, `question`, `enhancement`, and `needs-info`
+- identify missing information such as version, environment, reproduction steps, expected behavior, and actual behavior
+- recognize common issue-template section headings as well as free-form issue text
 
-## What it does
-
-Given a Markdown issue file, `maintainer-copilot` returns JSON with:
-- `summary`
-- `label_candidates`
-- `missing_information`
-
-Example output:
-
-```json
-{
-  "summary": "Title: Crash when starting app on Windows...",
-  "label_candidates": ["bug", "needs-info"],
-  "missing_information": [
-    "app version or commit SHA",
-    "steps to reproduce"
-  ]
-}
-```
+Current implementation status:
+- local CLI works
+- issue-triage heuristics are tested
+- question vs enhancement disambiguation is implemented
+- issue template-aware parsing is implemented
 
 ## Quick start
 
-### 1. Clone
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/pt533/maintainer-copilot.git
 cd maintainer-copilot
 ```
 
-### 2. Create a virtual environment
+### 2. Create and activate a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install
+### 3. Install the project
 
 ```bash
 pip install -e .
 ```
 
-### 4. Run
+### 4. Run the CLI
 
 ```bash
 mcopilot examples/sample_issue.md
 ```
 
-## Example
+## Example input
 
-Example input issue:
+Example issue report:
 
 ```text
-The CLI crashes when I run it on Python 3.11.
-I expected it to print triage output, but it exits with an error.
-No reproduction steps were included.
+Title: Crash when starting app on Windows
+
+Version: 0.1.0
+Environment: Windows 11
+
+Steps to reproduce:
+1. Launch the app
+2. Wait for startup
+
+Expected behavior:
+The app should start normally.
+
+Actual behavior:
+The app crashes immediately with a traceback.
 ```
 
-Example triage focus:
+## Example output
 
-- summarize the report
-- suggest likely labels such as `bug` or `needs-info`
-- highlight missing reproduction details
+```json
+{
+  "summary": "Title: Crash when starting app on Windows Version: 0.1.0 Environment: Windows 11 Steps to reproduce: 1. Launch the app 2. Wait for startup Expected behavior: The app should start normally. Actual behavior: The app crashes immediately with a traceback.",
+  "label_candidates": ["bug"],
+  "missing_information": []
+}
+```
+
+For an incomplete report, the tool may instead suggest labels like `needs-info` and list the details that a maintainer should request before review.
+
+## Maintainer workflow
+
+This repository is designed around a simple maintainer-first workflow:
+
+1. Receive a Markdown issue report.
+2. Generate a summary for quick first-pass reading.
+3. Suggest likely starting labels.
+4. Detect what information is still missing.
+5. Let a human maintainer make the final triage decision.
+
+This repository also uses:
+- issue templates for structured reports
+- pull request templates for consistent review
+- labels for triage and prioritization
+- milestones for roadmap tracking
+- CODEOWNERS for repository ownership clarity
 
 ## Current scope
 
-This repository is currently a minimal starter for:
+The current scope is intentionally narrow:
 - local issue triage
 - maintainable CLI structure
-- future GitHub Action integration
+- tested heuristics for first-pass maintainer assistance
+- a foundation for future GitHub Action integration
+
+This project does **not** auto-close issues or replace human judgment.
+It is intended to support maintainers, not override them.
 
 ## Roadmap
 
-- [x] Local CLI for issue triage
-- [ ] Better label heuristics
-- [ ] Configurable rules
-- [ ] GitHub Action for new issues
-- [ ] PR review brief generation
-- [ ] Release note draft support
+### MVP v0.2
+- [x] Improve label suggestion heuristics for incomplete bug reports
+- [x] Add tests for triage label and missing-information heuristics
+- [x] Improve question vs enhancement disambiguation
+- [x] Support issue template-aware parsing
 
-## Why this project matters
+### Next
+- [ ] Add confidence scoring to triage output
+- [ ] Add configurable project-specific rules
+- [ ] Add structured output modes for automation
+- [ ] Add GitHub Action integration for new issues
+- [ ] Add PR review brief generation
+- [ ] Add release note draft support
 
-Open-source maintenance is not only code writing.
-A lot of work is repetitive review preparation, issue cleanup, and release preparation.
+## Project status
 
-This project is meant to grow into a practical maintainer assistant for those workflows.
+This repository is in early development, but it is actively maintained and already usable for local issue-triage experiments and workflow design.
+
+Recent work has focused on improving triage quality, strengthening tests, and making the CLI more useful for real maintainer workflows.
 
 ## Contributing
 
-This project is currently early-stage, but feedback and small improvements are welcome.
+Feedback, bug reports, and small focused pull requests are welcome.
+
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
 ## Security
@@ -131,4 +154,5 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 Please read [SECURITY.md](./SECURITY.md) before reporting vulnerabilities.
 
 ## License
+
 MIT. See [LICENSE](./LICENSE).
