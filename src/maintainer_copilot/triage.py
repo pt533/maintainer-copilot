@@ -1,8 +1,28 @@
+import re
 from pathlib import Path
 
 BUG_WORDS = {"error", "bug", "crash", "failed", "failure", "exception", "traceback"}
 QUESTION_WORDS = {"how", "why", "can", "does", "question", "help"}
 FEATURE_WORDS = {"feature", "request", "would like", "enhancement", "support"}
+
+SECTION_ALIASES = {
+    "version": "version",
+    "app version": "version",
+    "commit sha": "version",
+    "environment": "environment",
+    "runtime or os environment": "environment",
+    "os": "environment",
+    "steps to reproduce": "steps_to_reproduce",
+    "reproduction steps": "steps_to_reproduce",
+    "how to reproduce": "steps_to_reproduce",
+    "expected behavior": "expected_behavior",
+    "what did you expect?": "expected_behavior",
+    "what did you expect": "expected_behavior",
+    "actual behavior": "actual_behavior",
+    "what happened?": "actual_behavior",
+    "what happened": "actual_behavior",
+}
+
 
 def simple_summary(text: str) -> str:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
@@ -10,6 +30,54 @@ def simple_summary(text: str) -> str:
         return "Empty issue."
     joined = " ".join(lines)
     return joined[:220] + ("..." if len(joined) > 220 else "")
+
+
+def _normalize_section_name(name: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", name.strip().strip(":").lower())
+    return SECTION_ALIASES.get(normalized)
+
+
+def parse_issue_sections(text: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    current_key: str | None = None
+    current_lines: list[str] = []
+
+    def flush() -> None:
+        nonlocal current_key, current_lines
+        if current_key:
+            value = "\n".join(current_lines).strip()
+            if value:
+                sections[current_key] = value
+        current_key = None
+        current_lines = []
+
+    for raw_line in text.splitlines():
+        stripped = raw_line.strip()
+
+        markdown_heading = re.match(r"^#{1,6}\s+(.+?)\s*$", stripped)
+        if markdown_heading:
+            normalized = _normalize_section_name(markdown_heading.group(1))
+            if normalized:
+                flush()
+                current_key = normalized
+                continue
+
+        if ":" in stripped:
+            head, _, tail = stripped.partition(":")
+            normalized = _normalize_section_name(head)
+            if normalized:
+                flush()
+                current_key = normalized
+                if tail.strip():
+                    current_lines.append(tail.strip())
+                continue
+
+        if current_key:
+            current_lines.append(raw_line.rstrip())
+
+    flush()
+    return sections
+
 
 def suggest_labels(text: str) -> list[str]:
     lowered = text.lower()
@@ -57,21 +125,42 @@ def suggest_labels(text: str) -> list[str]:
 
     return list(dict.fromkeys(labels))
 
+
 def missing_information(text: str) -> list[str]:
     lowered = text.lower()
+    sections = parse_issue_sections(text)
+
     checks = {
-        "app version or commit SHA": ["version", "commit", "sha"],
-        "runtime or OS environment": ["environment", "os", "ubuntu", "windows", "macos", "linux"],
-        "steps to reproduce": ["steps to reproduce", "reproduce", "how to reproduce"],
-        "expected behavior": ["expected", "should happen"],
-        "actual behavior": ["actual", "happened", "instead"],
+        "app version or commit SHA": (
+            ["version", "commit", "sha"],
+            "version",
+        ),
+        "runtime or OS environment": (
+            ["environment", "os", "ubuntu", "windows", "macos", "linux"],
+            "environment",
+        ),
+        "steps to reproduce": (
+            ["steps to reproduce", "reproduce", "how to reproduce"],
+            "steps_to_reproduce",
+        ),
+        "expected behavior": (
+            ["expected", "should happen"],
+            "expected_behavior",
+        ),
+        "actual behavior": (
+            ["actual", "happened", "instead"],
+            "actual_behavior",
+        ),
     }
 
     missing = []
-    for name, keywords in checks.items():
-        if not any(keyword in lowered for keyword in keywords):
+    for name, (keywords, section_key) in checks.items():
+        has_section = bool(sections.get(section_key))
+        has_keywords = any(keyword in lowered for keyword in keywords)
+        if not has_section and not has_keywords:
             missing.append(name)
     return missing
+
 
 def triage_issue_file(path: str) -> dict:
     text = Path(path).read_text(encoding="utf-8")
