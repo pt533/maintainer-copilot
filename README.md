@@ -93,6 +93,15 @@ The app crashes immediately with a traceback.
 
 For an incomplete report, the tool may instead suggest labels like `needs-info` and list the details that a maintainer should request before review.
 
+## More examples
+
+Additional sample issues are available in [`examples/`](./examples/):
+
+- [`bug_windows_startup.md`](./examples/bug_windows_startup.md)
+- [`question_label_usage.md`](./examples/question_label_usage.md)
+- [`enhancement_config_rules.md`](./examples/enhancement_config_rules.md)
+- [`incomplete_report_needs_info.md`](./examples/incomplete_report_needs_info.md)
+
 ## Maintainer workflow
 
 This repository is designed around a simple maintainer-first workflow:
