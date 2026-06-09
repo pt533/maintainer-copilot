@@ -125,7 +125,6 @@ def suggest_labels(text: str) -> list[str]:
 
     return list(dict.fromkeys(labels))
 
-
 def missing_information(text: str) -> list[str]:
     lowered = text.lower()
     sections = parse_issue_sections(text)
@@ -157,10 +156,26 @@ def missing_information(text: str) -> list[str]:
     for name, (keywords, section_key) in checks.items():
         has_section = bool(sections.get(section_key))
         has_keywords = any(keyword in lowered for keyword in keywords)
+
+        # 補強：incomplete report 判定を少し厳しくする
+        if name == "steps to reproduce":
+            # 具体的な step 番号があるが、reproduce 関連単語がないなら still missing
+            has_step_number = re.search(r"\d+\s*\.", lowered)
+            if has_step_number and not has_keywords:
+                has_keywords = False
+
+        if name == "actual behavior":
+            # error 関連単語がなければ still missing
+            has_error_like = any(
+                word in lowered
+                for word in ["error", "traceback", "exception", "fail", "crash", "broken"]
+            )
+            if not has_error_like and not has_keywords:
+                has_keywords = False
+
         if not has_section and not has_keywords:
             missing.append(name)
     return missing
-
 
 def triage_issue_file(path: str) -> dict:
     text = Path(path).read_text(encoding="utf-8")
