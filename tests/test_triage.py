@@ -138,3 +138,33 @@ Actual behavior: the command crashes
 
     assert missing_information(template_text) == []
     assert missing_information(free_form_text) == []
+
+def test_missing_information_zero_for_both_template_and_freeform():
+    """template 形式と free-form 形式の両方で missing_information=[] になることを確認"""
+    template_text = """Title: Bug
+
+## Version
+1.2.3
+
+## Environment
+Ubuntu
+
+## Steps to reproduce
+run cli
+
+## Expected behavior
+success
+
+## Actual behavior
+crash
+"""
+    free_form_text = """Title: Bug
+
+Version: 1.2.3
+Environment: Ubuntu
+Steps to reproduce: run cli
+Expected behavior: success
+Actual behavior: crash
+"""
+    assert missing_information(template_text) == []
+    assert missing_information(free_form_text) == []
